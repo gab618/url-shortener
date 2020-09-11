@@ -4,7 +4,14 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const path = require("path");
 const yup = require("yup");
+const monk = require("monk");
 const { nanoid } = require("nanoid");
+
+require("dotenv").config();
+
+const db = monk(process.env.MONGO_URI);
+const urls = db.get("urls");
+urls.createIndex("name");
 
 const app = express();
 
@@ -31,11 +38,25 @@ app.post("/url", async (req, res, next) => {
   let { slug, url } = req.body;
   try {
     await schema.validate({ slug, url });
+
     if (!slug) {
       slug = nanoid(5);
+    } else {
+      const slugExists = await urls.findOne({ slug });
+      if (slugExists) {
+        throw new Error("Slug in use");
+      }
     }
     slug = slug.toLowerCase();
-    res.json({ slug, url });
+
+    const newUrl = {
+      url,
+      slug,
+    };
+
+    const created = await urls.insert(newUrl);
+
+    res.json(newUrl);
   } catch (error) {
     next(error);
   }
