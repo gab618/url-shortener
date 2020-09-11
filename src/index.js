@@ -11,7 +11,7 @@ require("dotenv").config();
 
 const db = monk(process.env.MONGO_URI);
 const urls = db.get("urls");
-urls.createIndex("name");
+urls.createIndex({ slug: 1 }, { unique: true });
 
 const app = express();
 
@@ -22,8 +22,17 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-app.get("/:id", (req, res) => {
-  // TODO: redirect to url
+app.get("/:id", async (req, res) => {
+  const { id: slug } = req.params;
+  try {
+    const url = await urls.findOne({ slug });
+    if (url) {
+      res.redirect(url.url);
+    }
+    res.redirect(`/?error=${slug} not found`);
+  } catch (error) {
+    res.redirect(`/?error=Link not found`);
+  }
 });
 
 const schema = yup.object().shape({
