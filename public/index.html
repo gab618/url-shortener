@@ -1,6 +1,11 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
+    />
+
     <title>URL Shortner</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -8,5 +13,22 @@
     <header>
       <h1>URL Shortner</h1>
     </header>
+    <main id="app">
+      <form @submit.prevent="createUrl()">
+        <label for="url">Url</label>
+        <input v-model="url" name="url" id="url" type="text" />
+
+        <label for="slug">Slug</label>
+        <input v-model="slug" name="slug" id="slug" type="text" />
+
+        <button type="submit">Create</button>
+      </form>
+
+      <pre>
+        {{JSON.stringify(created, null, 2)}}
+      </pre>
+    </main>
+    <script src="vue.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
