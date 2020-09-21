@@ -20,7 +20,10 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "..", "public")));
+//app.use(express.static(path.join(__dirname, "..", "public")));
+app.get("/", async (req, res) => {
+  return res.json({ blindas: "?XD" });
+});
 
 app.get("/:id", async (req, res) => {
   const { id: slug } = req.params;
